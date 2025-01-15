@@ -7,20 +7,21 @@ const fs = require('fs');
 require('dotenv').config();
 
 console.log(process.env.APP_NAME);
-console.log(process.env.API_URL); 
-console.log(process.env.PORT); 
+console.log(process.env.API_URL);
+console.log(process.env.PORT);
 
 class Server {
   constructor() {
 
-    if (process.env.NODE_ENV == "development"){
+    if (process.env.NODE_ENV == "development") {
       this.key = "server.key";
       this.cert = "server.crt";
     }
-    else{
-      this.key = "/etc/ssl/server.key";
-      this.cert = "/etc/ssl/server.crt";
-    }
+    else
+      if (process.env.NODE_ENV == "production") {
+        this.key = "/etc/ssl/server.key";
+        this.cert = "/etc/ssl/server.crt";
+      }
 
     // Load SSL Certificates
     const sslOptions = {
@@ -63,21 +64,21 @@ class Server {
       );
     });
   }
-/*
+  /*
+    listen() {
+      this.app.listen(this.port, () => {
+        console.log("Server running on port: ", this.port);
+      });
+    }
+  */
+
   listen() {
-    this.app.listen(this.port, () => {
-      console.log("Server running on port: ", this.port);
+
+    // Start HTTPS server
+    https.createServer(this.sslOptions, this.app).listen(this.httpsPort, () => {
+      console.log(`HTTPS Server running on port: ${this.httpsPort}`);
     });
   }
-*/
-
-listen() {
-
-  // Start HTTPS server
-  https.createServer(this.sslOptions, this.app).listen(this.httpsPort, () => {
-    console.log(`HTTPS Server running on port: ${this.httpsPort}`);
-  });
-}
 
 
 }
